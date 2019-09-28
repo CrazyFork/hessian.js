@@ -1,3 +1,72 @@
+
+
+
+-> 高阶type的编码 0x74 [length] [type str]
+```
+  this.byteBuffer
+    .put(0x74)
+    .putUInt16(type.length)
+    .putRawString(type);
+```
+
+
+-> `this.objects = [];` 
+
+```
+function Encoder(options) {
+  options = options || {};
+  //array of buffer
+  this.byteBuffer = new ByteBuffer({
+    size: options.size
+  });
+  
+  // 这个地方用来存储 ref 所指向对象的地址
+  this.objects = [];
+}
+
+
+
+
+proto._checkRef = function (obj) {
+  var refIndex = this.objects.indexOf(obj);
+  if (refIndex >= 0) {
+    // already have this object
+    // just write ref
+    debug('writeObject with a refIndex: %d', refIndex);
+    this.writeRef(refIndex);
+    return true;
+  }
+  // a new comming object
+  this.objects.push(obj);
+  return false;
+};
+
+
+```
+
+
+-> `writeObject`
+writeObject 支持circular的方式是
+* 如果是map对象, 无所谓, 从新按map值处理一遍
+* 如果是普通object对象:
+  * 第一步先查看是否被添加过
+  * yes: put a ref
+  * no: serialize this object
+
+```
+/**
+ * encode object
+ *   support circular
+ *   support all kind of java object
+ * : {a: 1}
+ * : {$class: 'java.lang.Map', $: {a: 1}}
+ */
+proto.writeObject = function (obj) {
+```
+
+
+
+
 hessian.js
 =========
 
