@@ -1,4 +1,23 @@
 
+Hessian 协议的官方文档: http://hessian.caucho.com/doc/hessian-serialization.html#anchor21
+应该是2.0的版本
+
+
+项目里边有v1,和 v2两种定义
+* ` "byte": "^1.4.1",` byteBuffer 对写入byte有些封装, 用于便携写入bytes.
+
+
+references map 需要注意下, Hessian 协议支持 circular ref.
+> Hessian 2.0 has 3 internal reference maps:
+
+  * An map/object/list reference map.
+  * An class definition map.
+  * A type (class name) map.
+
+
+encoder 中需要注意的点
+* writeString 的时候的 `surrogate pairs` 概念, byte 不允许在 `surrogate pairs` 中分隔.
+* 协议后 open / final 的概念, 先读一段open的data, 在读最后final的data
 
 
 -> 高阶type的编码 0x74 [length] [type str]
